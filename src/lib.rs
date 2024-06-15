@@ -24,12 +24,22 @@ mod hello {
                 .mint_initial_supply(1000)
                 .into();
 
+                let owner_badge: Bucket = ResourceBuilder::new_fungible(OwnerRole::None)
+                .metadata(metadata!(init{
+                    "name" => "Gumball Machine Owner Badge", locked;
+                }))
+                .divisibility(DIVISIBILITY_NONE)
+                .mint_initial_supply(1)
+                .into();
+
             // Instantiate a Hello component, populating its vault with our supply of 1000 HelloToken
             Self {
                 sample_vault: Vault::with_bucket(my_bucket),
             }
             .instantiate()
-            .prepare_to_globalize(OwnerRole::None)
+            .prepare_to_globalize(OwnerRole::Fixed(rule!(require(
+                owner_badge.resource_address()
+            ))))
             .globalize()
         }
 
